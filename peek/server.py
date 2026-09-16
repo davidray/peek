@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import subprocess
 import sys
-import tempfile
 import time
 from pathlib import Path
 
@@ -34,6 +33,7 @@ def peek(max_side: int = 1500, device: int = 0) -> list:
         [sys.executable, "-m", "peek.camera", str(out), "--max-side", str(max_side), "--device", str(device)],
         capture_output=True,
         text=True,
+        check=False,
     )
     if proc.returncode == 1:
         return ["The user cancelled the photo (pressed Escape or closed the window)."]
