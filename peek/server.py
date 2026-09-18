@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import subprocess
 import sys
 import time
@@ -44,7 +45,21 @@ def peek(max_side: int = 1500, device: int = 0) -> list:
 
 
 def main() -> None:
-    mcp.run()
+    """Entry point. Defaults to stdio (what every MCP client expects). Pass
+    `--transport http` to instead serve streamable HTTP, e.g. for clients
+    (like ChatGPT connectors) that only speak to a reachable URL rather than
+    launching a local process -- typically paired with a tunnel.
+    """
+    p = argparse.ArgumentParser(prog="peek")
+    p.add_argument("--transport", choices=["stdio", "http"], default="stdio")
+    p.add_argument("--host", default="127.0.0.1", help="bind host for --transport http")
+    p.add_argument("--port", type=int, default=8000, help="bind port for --transport http")
+    args = p.parse_args()
+
+    if args.transport == "stdio":
+        mcp.run()
+    else:
+        mcp.run(transport="streamable-http", host=args.host, port=args.port)
 
 
 if __name__ == "__main__":
